@@ -1,0 +1,26 @@
+{
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "koa": "^2.13.4",
+    "mongodb": "^4.2.1"
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon -r dotenv/config server.js",
+    "start": "node server.js"
+  },
+  "name": "trigger-warning-bot-server",
+  "version": "1.0.0",
+  "description": "Server for Trigger Warning Bot",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UJKhokhar/TriggerWarningBotServer.git"
+  },
+  "author": "Umi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/UJKhokhar/TriggerWarningBotServer/issues"
+  },
+  "homepage": "https://github.com/UJKhokhar/TriggerWarningBotServer#readme"
+}
