@@ -26,7 +26,7 @@ const connectDb = async () => {
     if (user == null) {
       console.log('user not found');
     } else {
-      
+      console.log('user: ' + user);
     }
 
     mongoose.disconnect();
