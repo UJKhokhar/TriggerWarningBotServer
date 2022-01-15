@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
+  _id: Number,
   username: String,
   user_id: Number,
   bot_access: Boolean,
@@ -17,22 +18,22 @@ const options = { useNewUrlParser: true, useUnifiedTopology: true };
 
 const User = mongoose.model('User', userSchema);
 
-const connectDb = async () => {
+export const userLookUp = async (userId) => {
   try {
     await mongoose.connect(uri, options);
-    const id = '5ebadc45a99bde77b2efb20e';
-    const user = await User.findById(id);
+    // const id = '5ebadc45a99bde77b2efb20e';
+    const user = await User.findById(userId).exec();
 
     if (user == null) {
-      console.log('user not found');
+      console.log('user not found: ' + user);
     } else {
-      console.log('user: ' + user);
+      console.log('user from db found: ' + JSON.stringify(user, null, 2));
     }
 
-    mongoose.disconnect();
+    await mongoose.disconnect();
+
+    return user;
   } catch (error) {
     console.log(error)
   }
-}
-
-connectDb();
+};

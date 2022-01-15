@@ -1,8 +1,13 @@
+// Packages
 import Koa from 'koa';
 import cors from '@koa/cors';
 import Router from 'koa-router';
 import axios from 'axios';
 import bodyParser from 'koa-bodyparser';
+
+// DB
+import { userLookUp } from './db.js';
+
 
 const app = new Koa();
 const router = new Router();
@@ -50,14 +55,32 @@ router
 
       // Get user by ID
       const getUserRequest = await axios.get(`https://api.twitch.tv/helix/users?id=${userId}`, config);
-      const userData = getUserRequest.data;
+      const userData = getUserRequest.data.data[0];
+      console.log('user from request: ' + userData);
 
-      if (userData) {
-        ctx.body = userData;
-        ctx.status = 200;
+      //TODO: Do user lookup
+      const userFromDb = await userLookUp(userId);
+      const username = userData.display_name;
+      console.log('userFromDb:   ' + userFromDb);
+      console.log('username:   ' + username);
+
+      // If user is not in the DB they are a new user
+      // and we need to show add bot to my channel button
+      // If they are an existing user we need to see if they have allowed access to the bot
+      if (userFromDb) {
+        ctx.body = {
+          username: username,
+          id: userId,
+          hasAccessToBot: 'VALUEFROMDB'
+        }
+      } else {
+        ctx.body = {
+         username: username,
+         id: userId,
+         hasAccessToBot: 'No'
+        }
       }
-
-    // return next();
+      // ctx.status = 200;
     } catch (error) {
       ctx.body = error;
       ctx.status = 400;
@@ -72,10 +95,3 @@ app
 app.listen(3030, () => {
   console.log('Server running on port 3030');
 });
-
-
-try {
-
-} catch (error) {
-
-}
