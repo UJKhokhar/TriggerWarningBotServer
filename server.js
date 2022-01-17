@@ -6,8 +6,7 @@ import axios from 'axios';
 import bodyParser from 'koa-bodyparser';
 
 // DB
-import { userLookUp } from './db.js';
-
+import { userLookUp, userUpsertWithBotAccess, removeBotAccess } from './db.js'
 
 const app = new Koa();
 const router = new Router();
@@ -60,6 +59,8 @@ router
 
       //TODO: Do user lookup
       const userFromDb = await userLookUp(userId);
+
+      // get username from Twitch user request
       const username = userData.display_name;
       console.log('userFromDb:   ' + userFromDb);
       console.log('username:   ' + username);
@@ -71,13 +72,13 @@ router
         ctx.body = {
           username: username,
           id: userId,
-          hasAccessToBot: 'VALUEFROMDB'
+          bot_access: userFromDb.bot_access,
         }
       } else {
         ctx.body = {
-         username: username,
-         id: userId,
-         hasAccessToBot: false
+          username: username,
+          id: userId,
+          bot_access: false,
         }
       }
       // ctx.status = 200;
@@ -86,8 +87,37 @@ router
       ctx.status = 400;
       console.log(error);
     }
-  });
+  })
+  .post('/requestBotAccess', async (ctx) => {
+    try {
+      // check body to see if new user
+      // mongoose findOneAndUpdate with upsert true
+      const doc = await userUpsertWithBotAccess(ctx.request.body);
 
+      console.log('REQUEST BOT ACCESS RESPONSE: ' + doc);
+
+      console.log('doc: ' + JSON.stringify(doc, null, 2));
+      ctx.body = doc;
+      ctx.status = 200;
+    }
+    catch (error) {
+      ctx.body = error || 'There was an issue with the add bot access request';
+      ctx.status = 400;
+    }
+  })
+  .post('/removeBotAccess', async (ctx) => {
+    try {
+      const doc = await removeBotAccess(ctx.request.body);
+
+      console.log('REMOVE BOT ACCESS RESPONSE: ' + doc);
+
+      ctx.body = doc;
+      ctx.status = 200;
+    } catch (error) {
+      ctx.body = error || 'There was an issue with the removing bot access request';
+      ctx.status = 400;
+    }
+  });
 app
   .use(router.routes())
   .use(router.allowedMethods());
