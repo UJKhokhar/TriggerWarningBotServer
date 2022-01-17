@@ -77,7 +77,7 @@ router
         ctx.body = {
          username: username,
          id: userId,
-         hasAccessToBot: 'No'
+         hasAccessToBot: false
         }
       }
       // ctx.status = 200;
