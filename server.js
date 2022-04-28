@@ -8,6 +8,14 @@ import bodyParser from 'koa-bodyparser';
 // DB
 import { userLookUp, userUpsertWithBotAccess, removeBotAccess } from './db.js'
 
+// ONE OFF FUNCTIONS
+import './functions.js';
+
+
+// Bot Functions;
+import './bot.js';
+import { joinChannel, leaveChannel } from './bot.js';
+
 const app = new Koa();
 const router = new Router();
 
@@ -94,9 +102,8 @@ router
       // mongoose findOneAndUpdate with upsert true
       const doc = await userUpsertWithBotAccess(ctx.request.body);
 
-      console.log('REQUEST BOT ACCESS RESPONSE: ' + doc);
+      joinChannel(doc.username);
 
-      console.log('doc: ' + JSON.stringify(doc, null, 2));
       ctx.body = doc;
       ctx.status = 200;
     }
@@ -109,7 +116,7 @@ router
     try {
       const doc = await removeBotAccess(ctx.request.body);
 
-      console.log('REMOVE BOT ACCESS RESPONSE: ' + doc);
+      leaveChannel(doc.username);
 
       ctx.body = doc;
       ctx.status = 200;
@@ -118,6 +125,7 @@ router
       ctx.status = 400;
     }
   });
+
 app
   .use(router.routes())
   .use(router.allowedMethods());

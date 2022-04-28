@@ -8,6 +8,12 @@ const userSchema = new Schema({
   bot_access: Boolean,
 });
 
+const gameSchema = new Schema({
+  name: String,
+  notes: String,
+  triggers: Array,
+});
+
 const DB_USER = process.env.MONGODB_USERNAME;
 const DB_PASS = process.env.MONGODB_PASSWORD;
 const DB_NAME = process.env.MONGODB_NAME;
@@ -16,6 +22,7 @@ const uri = `mongodb+srv://${DB_USER}:${DB_PASS}@${DB_NAME}.bu7m1.mongodb.net/Tr
 const dbOptions = { useNewUrlParser: true, useUnifiedTopology: true };
 
 const User = mongoose.model('User', userSchema);
+const Game = mongoose.model('Game', gameSchema);
 
 // Find user from DB
 export const userLookUp = async (userId) => {
@@ -94,3 +101,58 @@ export const removeBotAccess = async (userData) => {
     console.log(error)
   }
 };
+
+export const gameUpsert = async (gameData) => {
+  try {
+    await mongoose.connect(uri, dbOptions);
+
+    const filter = {
+      name: gameData.name,
+    };
+
+    const update = {
+      notes: gameData.notes,
+      triggers: gameData.triggers,
+    };
+
+    const options = {
+      upsert: true,
+      new: true,
+    };
+
+    const doc = await Game.findOneAndUpdate(filter, update, options);
+
+    await mongoose.disconnect();
+    return doc;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const gameLookup = async (gameName) => {
+  try {
+    await mongoose.connect(uri, dbOptions);
+
+    const filter = {
+      name: gameName,
+    };
+
+    const doc = await Game.findOne(filter).exec();
+    await mongoose.disconnect();
+
+    return doc;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+
+// TODO: Add game name to 'not in db yet' collection
+export const addGameRequest = async (gameName) => {
+  try {
+    await mongoose.connect(uri, dbOptions);
+    await mongoose.disconnect();
+  } catch (error) {
+
+  }
+}
