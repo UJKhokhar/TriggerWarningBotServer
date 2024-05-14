@@ -1,6 +1,7 @@
+// This file contains various helper functions
+
 import { gameUpsert } from "./db.js";
 import _ from 'lodash';
-
 
 const pokemonArceusData = {
   name: '     Pokémon Legends: Arceus   ',
@@ -22,10 +23,7 @@ const uniqueTriggers = _.uniq(lowercaseTriggers);
 
 gameData.triggers = uniqueTriggers;
 
-console.log(JSON.stringify(gameData));
-
+// Function to add the above test data into the database
 export const addGameToDB = (gameData) => {
   gameUpsert(gameData);
 };
-
-// addGameToDB(gameData);
