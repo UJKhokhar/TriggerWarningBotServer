@@ -44,8 +44,6 @@ router
   // 6) Send response to the front end based on whether the user has bot access or not
 
   // ctx is used to access the response body
-
-  // TODO: BREAKUP THIS ENDPOINT INTO DIFF FUNCTIONS
   .post('/authorize', async (ctx) => {
 
     try {
